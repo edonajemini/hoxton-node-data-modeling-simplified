@@ -109,25 +109,29 @@ function createInterviews(){
             applicantsId: 1,
             interviewersId:2,
             time:"12/10/2022",
-            place:""
+            place:"",
+            successful:"yes"
         },
         {
             applicantsId: 2,
             interviewersId:3,
             time:"12/10/2022",
-            place:""
+            place:"",
+            successful:"no"
         },
         {
             applicantsId: 3,
             interviewersId:1,
             time:"12/10/2022",
-            place:""
+            place:"",
+            successful:"yes"
         },
         {
             applicantsId: 4,
             interviewersId:2,
             time:"12/10/2022",
-            place:""
+            place:"",
+            successful:"no"
         }
     ]
     
@@ -143,20 +147,21 @@ function createInterviews(){
                 interviewersId INTEGER  NOT NULL,
                 time TEXT,
                 place TEXT,
+                successful TEXT NOT NULL,
                 PRIMARY KEY (id),
                 FOREIGN KEY (applicantsId) REFERENCES applicants(id) ON DELETE CASCADE,
                 FOREIGN KEY (interviewersId) REFERENCES interviewers(id) ON DELETE CASCADE
             );
         `)
         createInterviewsTable.run();
-        
+
     
         const createNewInterview = db.prepare(`
-            INSERT INTO interviews (applicantsId, interviewersId, time, place) VALUES (?,?,?,?);
+            INSERT INTO interviews (applicantsId, interviewersId, time, place, successful) VALUES (?,?,?,?,?);
         `)
     
         for(let interview of interviews){
-            createNewInterview.run(interview.applicantsId, interview.interviewersId, interview.time, interview.place);
+            createNewInterview.run(interview.applicantsId, interview.interviewersId, interview.time, interview.place, interview.successful);
         }
 }
 
