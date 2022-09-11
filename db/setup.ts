@@ -139,20 +139,20 @@ function createInterviews(){
     const createInterviewsTable = db.prepare(`
             CREATE TABLE IF NOT EXISTS interviews (
                 id INTEGER NOT NULL,
-                applicantId INTEGER NOT NULL,
-                interviewerId INTEGER  NOT NULL,
+                applicantsId INTEGER NOT NULL,
+                interviewersId INTEGER  NOT NULL,
                 time TEXT,
                 place TEXT,
                 PRIMARY KEY (id),
-                FOREIGN KEY (applicantId) REFERENCES applicants(id) ON DELETE CASCADE,
-                FOREIGN KEY (interviewerId) REFERENCES interviewers(id) ON DELETE CASCADE
+                FOREIGN KEY (applicantsId) REFERENCES applicants(id) ON DELETE CASCADE,
+                FOREIGN KEY (interviewersId) REFERENCES interviewers(id) ON DELETE CASCADE
             );
         `)
         createInterviewsTable.run();
-
+        
     
         const createNewInterview = db.prepare(`
-            INSERT INTO interviews (applicantId, interviewerId, time, place) VALUES (?,?,?,?);
+            INSERT INTO interviews (applicantsId, interviewersId, time, place) VALUES (?,?,?,?);
         `)
     
         for(let interview of interviews){

@@ -14,11 +14,13 @@ app.get('/', (req, res) => {
     <li><a href="/applicants">Applicants</a></li>
     <li><a href="/interviewers">Interviewers</a></li>
     <li><a href="/interviews">Interviews</a></li>
+    <li><a href="/companies">Companies</a> </li>
+    <li><a href="/employees">Employees</a> </li>
     </ul>
     `)
   })
   
- 
+ //get them all
   const getApplicants = db.prepare(`
   SELECT * FROM applicants;
   `)
@@ -26,18 +28,33 @@ app.get('/', (req, res) => {
   SELECT * FROM interviewers;
   `)
   const getInterviews = db.prepare(`
-  SELECT * FROM interviewers;
+  SELECT * FROM interviews;
   `)
-  
+  const getCompanies = db.prepare(`
+  SELECT * FROM companies`)
+  const getEmployees = db.prepare(`
+  SELECT * FROM employees`)
+
+
+ //get them by Id
   const getApplicantsById = db.prepare(`
   SELECT * FROM applicants WHERE id = ?;
   `)
   const getInterviewersById = db.prepare(`
-SELECT * FROM interviewers WHERE id = ?;
-`)
-const getInterviewsById = db.prepare(`
-SELECT * FROM interviews WHERE id = ?;
-`)
+  SELECT * FROM interviewers WHERE id = ?;
+  `)
+  const getInterviewsById = db.prepare(`
+  SELECT * FROM interviews WHERE id = ?;
+  `)
+  const getCompaniesById = db.prepare(`
+  SELECT * FROM companies WHERE id = ?;
+  `)
+  const getEmployeesById = db.prepare(`
+  SELECT * FROM employees WHERE id = ?;
+  `)
+
+
+  //get everything else
   const getInterviewsForApplicants = db.prepare(`
   SELECT * FROM interviews WHERE applicantsId = ?;
   `)
@@ -55,6 +72,17 @@ JOIN interviews ON applicants.id = interviews.applicantsId
 WHERE interviews.interviewersId = ?;
 `)
   
+//get employees with the companies they work in
+app.get('/employees', (req, res) => {
+    const employees = getEmployees.all()
+    res.send(employees)
+  })
+
+//get companies 
+app.get('/companies', (req, res) => {
+    const companies = getCompanies.all()
+    res.send(companies)
+  })
 
 //get applicants with their interviews and interviewers
   app.get('/applicants', (req, res) => {
@@ -141,23 +169,23 @@ app.get('/interviewers/:id', (req, res) => {
   })
    // Post Interviewer
    const postInterviewer = db.prepare(`
-  INSERT INTO interviewers (name, company) VALUES (?, ?);
+  INSERT INTO interviewers (name, companyId) VALUES (?, ?);
   `)
 
   app.post('/interviewers', (req, res) => {
     const name = req.body.name
-    const company = req.body.company
+    const companyId = req.body.companyId
       let errors: string[] = []
       
       if (typeof req.body.name !== 'string') {
           errors.push('Add a proper NAME!')
         }
      
-      if(typeof req.body.company  !=='string') {
-          errors.push('Add a proper TYPE OF company')
+      if(typeof req.body.companyId  !=='number') {
+          errors.push('Add a proper company ID')
       }
       if( errors.length === 0)  {
-        const interviewerInfo = postInterviewer.run(name, company)
+        const interviewerInfo = postInterviewer.run(name, companyId)
         const newInterviewer = getInterviewersById.get(interviewerInfo.lastInsertRowid)
         res.send(newInterviewer)
       }
