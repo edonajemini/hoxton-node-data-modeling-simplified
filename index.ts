@@ -104,8 +104,17 @@ app.get('/companies', (req, res) => {
     }
     res.send(companies)
   })
-  
-
+   //get companies with employees by id
+   app.get('/companies/:id', (req, res) => {
+    const id = Number(req.params.id)
+  const company = getCompaniesById.get(id)
+    if (company) {
+        company.employees = getEmployeesforCompanies.all(company.id)
+      res.send(company)
+    } else {
+      res.status(404).send({ error: 'Company not found' })
+    }
+  })
 //get applicants with their interviews and interviewers
   app.get('/applicants', (req, res) => {
     const applicants = getApplicants.all()
