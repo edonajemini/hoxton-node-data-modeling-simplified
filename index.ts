@@ -79,19 +79,23 @@ const getEmployeesforCompanies = db.prepare(`
 //get employees 
 app.get('/employees', (req, res) => {
     const employees = getEmployees.all()
+    for(let employee of employees){
+        employee.companies = getCompaniesById.get(employee.companyId)
+    }
     res.send(employees)
+    
   })
   //get employees with the companies they work in by id
   app.get('/employees/:id', (req, res) => {
-    const employees = getEmployees.all()
-  
-      for (let employee of employees) {
-        employee.comanies = getCompaniesById.get(employee.companyId)
-        res.send(employee)
-      }
-      
-  }
-  )
+    const id = Number(req.params.id)
+    const employee = getEmployeesById.get(id)
+    if (employee) {
+        employee.companies = getCompaniesById.get(employee.companyId)
+      res.send(employee)
+    } else {
+      res.status(404).send({ error: 'Employee not found' })
+    }
+  })
 //get companies with employees
 app.get('/companies', (req, res) => {
     const companies = getCompanies.all()
@@ -239,6 +243,32 @@ app.get('/interviewers/:id', (req, res) => {
           const interviewInfo = postInterviews.run(applicantsId, interviewersId, time, place)
           const newInterviews = getInterviewsById.get(interviewInfo.lastInsertRowid)
           res.send(newInterviews)
+        }
+        else {
+            res.status(400).send({ errors: errors })
+          }
+    })
+    // Post Companies
+    const postCompanies = db.prepare(`
+    INSERT INTO companies (name, email) VALUES (?, ?);
+    `)
+  
+    app.post('/companies', (req, res) => {
+      const name = req.body.name
+      const email = req.body.email
+        let errors: string[] = []
+        
+        if (typeof req.body.name !== 'string') {
+            errors.push('Add a proper Name!')
+          }
+        if(typeof req.body.email  !=='string') {
+            errors.push('Add a proper Email')
+        }
+       
+        if( errors.length === 0)  {
+          const companyInfo = postCompanies.run(name, email)
+          const newCompany = getCompaniesById.get(companyInfo.lastInsertRowid)
+          res.send(newCompany)
         }
         else {
             res.status(400).send({ errors: errors })
