@@ -71,18 +71,36 @@ SELECT applicants.* FROM applicants
 JOIN interviews ON applicants.id = interviews.applicantsId
 WHERE interviews.interviewersId = ?;
 `)
+const getEmployeesforCompanies = db.prepare(`
+  SELECT * FROM employees WHERE companyId = ?;
+  `)
+
   
-//get employees with the companies they work in
+//get employees 
 app.get('/employees', (req, res) => {
     const employees = getEmployees.all()
     res.send(employees)
   })
-
-//get companies 
+  //get employees with the companies they work in by id
+  app.get('/employees/:id', (req, res) => {
+    const employees = getEmployees.all()
+  
+      for (let employee of employees) {
+        employee.comanies = getCompaniesById.get(employee.companyId)
+        res.send(employee)
+      }
+      
+  }
+  )
+//get companies with employees
 app.get('/companies', (req, res) => {
     const companies = getCompanies.all()
+    for(let company of companies){
+        company.employees = getEmployeesforCompanies.all(company.id)
+    }
     res.send(companies)
   })
+  
 
 //get applicants with their interviews and interviewers
   app.get('/applicants', (req, res) => {
