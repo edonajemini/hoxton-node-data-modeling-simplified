@@ -283,6 +283,36 @@ app.get('/interviewers/:id', (req, res) => {
             res.status(400).send({ errors: errors })
           }
     })
+    // TESTS
+
+   
+//    app.patch('/applicants/:id', (req, res) => {
+  
+//     let id = Number(req.params.id)
+//     let match = (applicant => applicant.id === id)
+//     if (match) {
+//       if (req.body.applicants) {
+//         match.applicants = req.body.applicants
+//       }
+  
+//       if (req.body.authorId) {
+//         match.authorId = req.body.authorId
+//       }
+//       res.send(match)
+//     } else {
+
+//       res.status(404).send({ error: 'applicants not found.' })
+//     }
+//   })
+
+  const deleteApplicants= db.prepare(`
+  DELETE FROM applicants WHERE id = ?;
+`) 
+    app.delete('/applicants/:id', (req, res) => {
+        const id = Number(req.params.id)
+        deleteApplicants.run(id)
+      })
+   
 
 
   app.listen(port, () => {
