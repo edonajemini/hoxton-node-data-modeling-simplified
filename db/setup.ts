@@ -89,7 +89,8 @@ function createInterviewers(){
             id INTEGER NOT NULL,
             name TEXT NOT NULL,
             companyId INTEGER NOT NULL,
-            PRIMARY KEY (id)
+            PRIMARY KEY (id),
+            FOREIGN KEY (companyId) REFERENCES companies(id) ON DELETE CASCADE
         );
     `)
     createInterviewersTable.run();
